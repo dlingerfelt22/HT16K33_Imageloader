@@ -10,4 +10,7 @@ We will be using pygame to load the images.
 Adafruits library for LED backpacks found here:
 https://github.com/adafruit/Adafruit_Python_LED_Backpack.git
 
+We will also be using a library written by  https://github.com/nonflammable at
+https://github.com/nonflammable/Adafruit_Python_LED_Backpack/blob/db2d8f76145436490925712205058fe74b115843/Adafruit_LED_Backpack/Matrix16x8.py
+
 I am far from a professional programmer, if you read my code and want to help. I would love it!
