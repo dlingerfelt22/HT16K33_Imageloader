@@ -11,42 +11,23 @@ from pygame.locals import *
 from Adafruit_LED_Backpack import Matrix16x8
 from copy import copy
 from Adafruit_I2C import Adafruit_I2C
+from Adafruit_LEDBackpack import LEDBackpack
 
 # define subroutine to clean up the place
 def cleanup():
     display.clear()
     start = time.time()
-    oldKey = "0b00000000000000"
-    newKey = "0b00000000000000"
+    oldKey = 0b00000000000000
+    Key = 0b00000000000000
+    extens = '.jpg'
+    image1 = "img\\" + "screensaver" + extens
+    image1 = pygame.image.load(image1)
+    # loads our image
+    screen.fill((255,255,255))
+    # In fullscreen
+    screen.blit(image1,(0,0))
+    pygame.display.flip()
 
-class LEDBackpack:
-  i2c = None
-
-  # Registers
-  __HT16K33_REGISTER_DISPLAY_SETUP        = 0x80
-  __HT16K33_REGISTER_SYSTEM_SETUP         = 0x20
-  __HT16K33_REGISTER_DIMMING              = 0xE0
-
-  # Data base addresses
-  __HT16K33_ADDRESS_KEY_DATA              = 0x40
-
-  # Blink rate
-  __HT16K33_BLINKRATE_OFF                 = 0x00
-  __HT16K33_BLINKRATE_2HZ                 = 0x01
-  __HT16K33_BLINKRATE_1HZ                 = 0x02
-  __HT16K33_BLINKRATE_HALFHZ              = 0x03
-
-  # Constructor
-  def __init__(self, address=0x71, debug=False):
-    self.i2c = Adafruit_I2C(address)
-    self.address = address
-    self.debug = debug
-
-  def getKeys(self, row):
-    "Returns a row of scanned key press values as a single 13-bit value (K13:K1)"
-    if (row > 2):
-      return
-    return self.i2c.readU16(self.__HT16K33_ADDRESS_KEY_DATA + row*2)
 
 #Initiate pygame even though we just use it to display images
 pygame.init()
@@ -55,11 +36,10 @@ screen = pygame.display.set_mode((0, 0),pygame.FULLSCREEN)
 
 # Create a display with a specific I2C address and/or bus.
 display = Matrix16x8.Matrix16x8(address=0x70, busnum=1)
-keypad = LEDBackpack(address=0x71, debug=False)
+keypad = LEDBackpack(address=0x71)
 
 # Initialize the display and keypad
 display.begin()
-keypad.begin()
 
 # Created lists of x,y iterated for each pest type.
 PA = [1, 1, 1, 2, 1, 3, 1, 4, 1, 5, 1, 6]
@@ -122,8 +102,17 @@ rows = [0, 1, 2]
 
 #indexed list for coordinating key press with bug type.
 pestKeyList = [PAVar, CAVar, StVar, SdVar, HcVar, SBVar, MdVar, HFVar, FFVar, PSFVar, FGVar, GRVar, AORVar, BBVar, FVar, SFVar, MVar, IMMVar, PWVar, YJVar, MqVar, RVar, TVar, BICVar]
-oldKey = "0b00000000000000"
-#a[start_index:end_index:step]
+oldKey = 0b00000000000000
+
+extens = '.jpg'
+image1 = "img\\" + "screensaver" + extens
+image1 = pygame.image.load(image1)
+# loads our image
+screen.fill((255,255,255))
+# In fullscreen
+screen.blit(image1,(0,0))
+pygame.display.flip()
+
 while True:
     start = time.time()
     #Main loop()
@@ -164,11 +153,11 @@ while True:
                                  display.write_display()
                         oldKey = key
                     else:
-                        elapsed = (time.time() - start())
+                        elapsed = time.time() - start
                         if elapsed > 600:
                             cleanup()
         else:
-            elapsed = (time.time() - start())
+            elapsed = time.time() - start
             if elapsed > 600:
                 cleanup()
     for event in pygame.event.get():
@@ -178,3 +167,4 @@ while True:
             if event.key == K_ESCAPE:
                 done = True
 pygame.quit()
+
