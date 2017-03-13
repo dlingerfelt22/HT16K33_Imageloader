@@ -16,11 +16,12 @@ from Adafruit_LEDBackpack import LEDBackpack
 # define subroutine to clean up the place
 def cleanup():
     display.clear()
+    display.write_display()
     start = time.time()
     oldKey = 0b00000000000000
     Key = 0b00000000000000
     extens = '.jpg'
-    image1 = "img\\" + "screensaver" + extens
+    image1 = "img/" + "screensaver" + extens
     image1 = pygame.image.load(image1)
     # loads our image
     screen.fill((255,255,255))
@@ -32,7 +33,7 @@ def cleanup():
 #Initiate pygame even though we just use it to display images
 pygame.init()
 screen = pygame.display.set_mode((0, 0),pygame.FULLSCREEN)
-
+done = False
 
 # Create a display with a specific I2C address and/or bus.
 display = Matrix16x8.Matrix16x8(address=0x70, busnum=1)
@@ -72,30 +73,30 @@ ledBugList = [PA, CA, St, Sd, Hc, SB, Md, HF, FF, PSF, FG, GR, AOR, BB, F, SF, M
 ledImgList = ['PA', 'CA', 'St', 'Sd', 'Hc', 'SB', 'Md', 'HF', 'FF', 'PSF', 'FG', 'GR', 'AOR', 'BB', 'F', 'SF', 'M', 'IMM', 'PW', 'YJ', 'Mq', 'R', 'T', 'BIC']
 
 # Key scan values that have the row appended to it since that is not returned. 
-PAVar = str(int(0b0000000000001))+str(1)
-CAVar = str(int(0b0000000000010))+str(1)
-StVar = str(int(0b0000000000100))+str(1)
-SdVar = str(int(0b0000000001000))+str(1)
-HcVar = str(int(0b0000000010000))+str(1)
-SBVar = str(int(0b0000000100000))+str(1)
-MdVar = str(int(0b0000001000000))+str(1)
-HFVar = str(int(0b0000010000000))+str(1)
-FFVar = str(int(0b0000100000000))+str(1)
-PSFVar = str(int(0b0001000000000))+str(1)
-FGVar = str(int(0b0000000000001))+str(2)
-GRVar = str(int(0b0000000000010))+str(2)
-AORVar = str(int(0b0000000000100))+str(2)
-BBVar = str(int(0b0000000001000))+str(2)
-FVar = str(int(0b0000000010000))+str(2)
-SFVar = str(int(0b0000000100000))+str(2)
-MVar = str(int(0b0000001000000))+str(2)
-IMMVar = str(int(0b0000010000000))+str(2)
-PWVar = str(int(0b0000100000000))+str(2)
-YJVar = str(int(0b0001000000000))+str(2)
-MqVar = str(int(0b0000000000001))+str(3)
-RVar = str(int(0b0000000000010))+str(3)
-TVar = str(int(0b0000000000100))+str(3)
-BICVar = str(int(0b0000000001000))+str(3)
+PAVar = str(int(0b0000000000001))+str(0)
+CAVar = str(int(0b0000000000010))+str(0)
+StVar = str(int(0b0000000000100))+str(0)
+SdVar = str(int(0b0000000001000))+str(0)
+HcVar = str(int(0b0000000010000))+str(0)
+SBVar = str(int(0b0000000100000))+str(0)
+MdVar = str(int(0b0000001000000))+str(0)
+HFVar = str(int(0b0000010000000))+str(0)
+FFVar = str(int(0b0000100000000))+str(0)
+PSFVar = str(int(0b0001000000000))+str(0)
+FGVar = str(int(0b0000000000001))+str(1)
+GRVar = str(int(0b0000000000010))+str(1)
+AORVar = str(int(0b0000000000100))+str(1)
+BBVar = str(int(0b0000000001000))+str(1)
+FVar = str(int(0b0000000010000))+str(1)
+SFVar = str(int(0b0000000100000))+str(1)
+MVar = str(int(0b0000001000000))+str(1)
+IMMVar = str(int(0b0000010000000))+str(1)
+PWVar = str(int(0b0000100000000))+str(1)
+YJVar = str(int(0b0001000000000))+str(1)
+MqVar = str(int(0b0000000000001))+str(2)
+RVar = str(int(0b0000000000010))+str(2)
+TVar = str(int(0b0000000000100))+str(2)
+BICVar = str(int(0b0000000001000))+str(2)
 
 # List that has the number of rows in it.
 rows = [0, 1, 2]
@@ -103,68 +104,78 @@ rows = [0, 1, 2]
 #indexed list for coordinating key press with bug type.
 pestKeyList = [PAVar, CAVar, StVar, SdVar, HcVar, SBVar, MdVar, HFVar, FFVar, PSFVar, FGVar, GRVar, AORVar, BBVar, FVar, SFVar, MVar, IMMVar, PWVar, YJVar, MqVar, RVar, TVar, BICVar]
 oldKey = 0b00000000000000
+timer = 600
 
 extens = '.jpg'
-image1 = "img\\" + "screensaver" + extens
+image1 = "img/" + "screensaver" + extens
 image1 = pygame.image.load(image1)
 # loads our image
 screen.fill((255,255,255))
 # In fullscreen
 screen.blit(image1,(0,0))
 pygame.display.flip()
+start = time.time()
 
-while True:
-    start = time.time()
+while not done:    
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            pygame.quit()
+            display.clear()
+        elif event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                done = True
     #Main loop()
-    for row in itertools.cycle(rows):
+    for row in rows:
+        time.sleep(0.1)
         key = keypad.getKeys(row)
-        if key != 0: 
+        key = str(key) + str(row)
+        if key != str(0) + str(row): 
             #test key against Var above
-            key = str(key) + str(row)
             for bug in pestKeyList:
                 if key == bug:
-                    newKey = key
-                    if newKey != oldKey:
+                    if key != oldKey:
                         start = time.time()
+                        print "key is " + key
                         stroke = pestKeyList.index(bug)
                         #set LEDset to bug LED array based on returned key.
                         LEDset = ledBugList[stroke]
                         LEDname = ledImgList[stroke]
                         # ADJUST TO PI FILE STRUCTURE
                         extens = '.jpg'
-                        image1 = "img\\" + LEDname + extens
+                        image1 = "img/" + LEDname + extens
                         image1 = pygame.image.load(image1)
                         # loads our image
                         screen.fill((255,255,255))
                         # In fullscreen
                         screen.blit(image1,(0,0))
                         pygame.display.flip()
+                        display.clear()
+                        a = 1
+                        c = 2
                         for x in LEDset[::2]:
                             x = x - 1
-                            for y in LEDset[1::2]:
-                                 y = y - 1
-                                 # Clear the display buffer.
-                                 display.clear()
-                                 # Set pixel at position i, j to on.  To turn off a pixel set
-                                 # the last parameter to 0.
-                                 display.set_pixel(x, y, 1)
-                                 # Write the display buffer to the hardware.  This must be called to
-                                 # update the actual display LEDs.
-                                 display.write_display()
+                            print "x " + str(x)
+                            y = LEDset[a:c]
+                            print y
+                            for b in y:
+                                b = b - 1
+                                print "y is " + str(b)
+                                display.set_pixel(x, b, 1)
+                            a = a + 2
+                            c = c + 2
+                        display.write_display()
                         oldKey = key
                     else:
-                        elapsed = time.time() - start
-                        if elapsed > 600:
+                        end = time.time()
+                        elapsed = end - start
+                        pygame.display.flip()
+                        if elapsed > timer:
                             cleanup()
-        else:
-            elapsed = time.time() - start
-            if elapsed > 600:
-                cleanup()
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            pygame.quit()
-        elif event.type == KEYDOWN:
-            if event.key == K_ESCAPE:
-                done = True
+        end = time.time()
+        elapsed = end - start
+        pygame.display.flip()
+        if elapsed > timer:
+            cleanup()
 pygame.quit()
+display.clear()
 
